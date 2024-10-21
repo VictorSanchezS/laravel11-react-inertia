@@ -18,9 +18,9 @@ use Inertia\Inertia;
 //     ]);
 // });
 
-Route::redirect('/', '/dashboard');
+//Route::redirect('/', '/dashboard');
 
-Route::get('/task/my-tasks', [TaskController::class, 'myTasks'])->name('task.my-tasks');
+//Route::get('/task/my-tasks', [TaskController::class, 'myTasks'])->name('task.my-tasks');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('project', ProjectController::class);

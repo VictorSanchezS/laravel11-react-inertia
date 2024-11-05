@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KanbanBoardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
@@ -18,7 +19,7 @@ use Inertia\Inertia;
 //     ]);
 // });
 
-//Route::redirect('/', '/dashboard');
+Route::redirect('/', '/dashboard');
 
 //Route::get('/task/my-tasks', [TaskController::class, 'myTasks'])->name('task.my-tasks');
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -27,6 +28,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/task/my-tasks', [TaskController::class, 'myTasks'])->name('task.my-tasks');
     Route::resource('task', TaskController::class);
     Route::resource('user', UserController::class);
+    Route::get('kanban', [ProjectController::class, 'kanban'])->name('kanban');
+    Route::patch('/api/projects/{project}/status', [ProjectController::class, 'updateStatus']);
 });
 
 Route::middleware('auth')->group(function () {
@@ -35,4 +38,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\TaskResource;
+use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\Request;
 
@@ -50,7 +51,7 @@ class DashboardController extends Controller
             'myProgressTasks',
             'totalCompletedTasks',
             'myCompletedTasks',
-            'activeTasks'
+            'activeTasks',
         ));
     }
 }

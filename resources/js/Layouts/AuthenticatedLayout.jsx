@@ -52,6 +52,12 @@ export default function AuthenticatedLayout({ user, header, children }) {
                                 >
                                     My Tasks
                                 </NavLink>
+                                <NavLink
+                                    href={route("kanban")}
+                                    active={route().current("kanban")}
+                                >
+                                    Kanban Projects
+                                </NavLink>
                             </div>
                         </div>
 

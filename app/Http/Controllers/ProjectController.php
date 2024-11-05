@@ -10,8 +10,12 @@ use App\Http\Resources\TaskResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
-class ProjectController extends Controller  
+
+class ProjectController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,11 +27,11 @@ class ProjectController extends Controller
         $sortField = request("sort_field", 'created_at');
         $sortDirection = request("sort_direction", "desc");
 
-        if (request("name")){
-            $query->where("name", "LIKE", "%". request("name"). "%");
+        if (request("name")) {
+            $query->where("name", "LIKE", "%" . request("name") . "%");
         }
 
-        if(request("status")){
+        if (request("status")) {
             $query->where("status", request("status"));
         }
 
@@ -59,8 +63,8 @@ class ProjectController extends Controller
         $image = $data['image'] ?? null;
         $data['created_by'] = Auth::id();
         $data['updated_by'] = Auth::id();
-        if($image){
-            $data['image_path'] = $image->store('project-/'.Str::random(), 'public');
+        if ($image) {
+            $data['image_path'] = $image->store('project-/' . Str::random(), 'public');
         }
         Project::create($data);
 
@@ -73,18 +77,18 @@ class ProjectController extends Controller
     public function show(Project $project)
     {
         $query = $project->tasks();
-        
+
         $sortField = request("sort_field", 'created_at');
         $sortDirection = request("sort_direction", "desc");
 
-        if (request("name")){
-            $query->where("name", "LIKE", "%". request("name"). "%");
+        if (request("name")) {
+            $query->where("name", "LIKE", "%" . request("name") . "%");
         }
 
-        if(request("status")){
+        if (request("status")) {
             $query->where("status", request("status"));
         }
-        
+
         $tasks = $query->orderBy($sortField, $sortDirection)->paginate(10)->onEachSide(1);
         return inertia('Project/Show', [
             'project' => new ProjectResource($project),
@@ -112,14 +116,14 @@ class ProjectController extends Controller
         $data = $request->validated();
         $image = $data['image'] ?? null;
         $data['updated_by'] = Auth::id();
-        if($image){
-            if($project->image_path){
+        if ($image) {
+            if ($project->image_path) {
                 Storage::disk('public')->deleteDirectory(dirname($project->image_path));
             }
-            $data['image_path'] = $image->store('project-/'.Str::random(), 'public');
+            $data['image_path'] = $image->store('project-/' . Str::random(), 'public');
         }
         $project->update($data);
-        return to_route('project.index')->with('success',"Project \"$project->name\" updated successfully");
+        return to_route('project.index')->with('success', "Project \"$project->name\" updated successfully");
     }
 
     /**
@@ -129,9 +133,27 @@ class ProjectController extends Controller
     {
         $name = $project->name;
         $project->delete();
-        if($project->image_path){
+        if ($project->image_path) {
             Storage::disk('public')->deleteDirectory(dirname($project->image_path));
         }
-        return to_route('project.index')->with('success',"Project \"$name\" deleted successfully");
+        return to_route('project.index')->with('success', "Project \"$name\" deleted successfully");
+    }
+
+    public function kanban()
+    {
+        $projects = Project::all();
+        return Inertia::render('Kanban', [
+            'projects' => $projects,
+        ]);
+    }
+
+    public function updateStatus(UpdateProjectRequest $request, Project $project)
+    {
+
+        $project->status = $request->input('status');
+        // $project->name = $request->input('name');
+        $project->save();
+
+        return response()->json(['message' => 'Status updated successfully']);
     }
 }
